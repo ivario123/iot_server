@@ -6,6 +6,7 @@ from flask import Flask, sessions
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask import Flask, session
+from flask_sslify import SSLify
 """
     Getting the latest config
 """
@@ -22,7 +23,9 @@ config_state = "DEFAULT" if config.get("DEFAULT","debug")!="yes" else "DEBUG"
 """
 cron = BackgroundScheduler(daemon=True)
 cron.start()
-
+import logging
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 
 @cron.scheduled_job('interval', seconds=int(config.get(config_state,"time_out")))
 def check():
@@ -36,7 +39,7 @@ from .models import User
 
 def create_app():
     app = Flask(__name__)
-    app.permanent_session_lifetime = timedelta(minutes=int(config.get(config_state,"session_lifetime")))
+    #app.permanent_session_lifetime = timedelta(minutes=int(config.get(config_state,"session_lifetime")))
     app.config['SECRET_KEY'] = config.get(config_state,"server_secret_key")
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
 
@@ -65,12 +68,10 @@ def create_app():
     from .backend_api import backend_api as bapi
     app.register_blueprint(bapi)
 
+
+    @app.before_first_request
+    def create_tables():
+        db.create_all()
+
     return app
 
-
-app = create_app()
-
-
-@app.before_first_request
-def create_tables():
-    db.create_all()

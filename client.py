@@ -22,3 +22,5 @@ class client():
 
     def inactivate(self):
         self.active = False
+    def change_state(self,state):
+        self.state = state

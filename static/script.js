@@ -9,9 +9,9 @@ controll_segment = null;
 window.onload = start();
 
 function start() {
-    fetch('/backend/list').then(function(response) {
+    fetch('/backend/list').then(function (response) {
         return response.json();
-    }).then(function(json) {
+    }).then(function (json) {
         console.log(json);
         devices = json;
         current_name = document.getElementById("name");
@@ -41,7 +41,13 @@ function change_active_device() {
     current_state.innerHTML = devices[index]["state"];
     current_type.innerHTML = devices[index]["type"];
 }
-
+function sleep(milliseconds) {
+    const date = Date.now();
+    let currentDate = null;
+    do {
+        currentDate = Date.now();
+    } while (currentDate - date < milliseconds);
+}
 function send_change_state(state) {
     let data = { "name": devices[index]["name"], "state": state };
 
@@ -49,18 +55,63 @@ function send_change_state(state) {
         method: "POST",
         body: JSON.stringify(data)
     }).then(res => {
+        sleep(100);
         start();
     });
+
 }
-
+function removeAllChildNodes(parent) {
+    while (parent.firstChild) {
+        parent.removeChild(parent.firstChild);
+    }
+}
 function change_controlls() {
-    if (devices[index]["type"] == "switch") {
-        button = document.createElement("button");
-        button.innerHTML = "Toggle";
-        button.onclick = function() { send_change_state(1 - parseInt(devices[index]["state"])) };
-
-        controll_segment.appendChild(button);
-        return
+    removeAllChildNodes(controll_segment);
+    switch(devices[index]["type"]){
+        case "switch":
+            button = document.createElement("button");
+            button.className = "button is-large";
+            button.innerHTML = "Toggle";
+            button.onclick = function () { send_change_state(1 - parseInt(devices[index]["state"])) };
+            controll_segment.appendChild(button);
+            break;
+        case "dimmer":
+            slider = document.createElement("div");
+            slider.id = "slider";
+            script = document.createElement("script");
+            script.innerHTML =  `
+            <script>
+                $("#slider").roundSlider({
+                    sliderType: "min-range",
+                    circleShape: "pie",
+                    startAngle: "315",
+                    lineCap: "round",
+                    radius: 130,
+                    width: 20,
+                
+                    min: -50,
+                    max: 50,
+                    
+                    svgMode: true,
+                    pathColor: "#eee",
+                    borderWidth: 0,
+                    
+                    startValue: 0,
+                    
+                    valueChange: function (e) {
+                        var color = e.isInvertedRange ? "#FF5722" : "#8BC34A";
+                    
+                    $("#slider").roundSlider({ "rangeColor": color, "tooltipColor": color });
+                    }
+                });
+                
+                var sliderObj = $("#slider").data("roundSlider");
+                sliderObj.setValue(30);
+            </script>
+            `
+            controll_segment.appendChild(slider);
+            
+            break;
     }
 
 }
@@ -72,13 +123,26 @@ function itter_index(offset) {
 
 function update_lables() {
     for (i = -1; i < elements.length - 1; i++) {
-        if (index + i >= 0 && index + i < devices.length) {
-            elements[i + 1].innerHTML = devices[index + i]["name"];
-            elements[i + 1].style.opacity = (elements.length - i) * 0.7;
-            elements[i + 1].onclick = itter_index(i);
-        } else {
 
-            elements[i + 1].style.display = "none";
+        elements[i + 1].style.display = "none";
+        if (0 <= index + i && index + i < devices.length) {
+            elements[i + 1].innerHTML = devices[index + i]["name"];
+            elements[i + 1].style.opacity = (elements.length - i) * 0.5;
+            switch (i) {
+                case -1:
+                    elements[i + 1].onclick = function () { itter_index(-1) };
+                    break;
+                case 0:
+                    elements[i + 1].onclick = function () { itter_index(0) };
+                    break;
+                case 1:
+                    elements[i + 1].onclick = function () { itter_index(1) };
+                    break;
+                case 2:
+                    elements[i + 1].onclick = function () { itter_index(2) };
+                    break;
+            }
+            elements[i + 1].style.display = "";
         }
     }
 }

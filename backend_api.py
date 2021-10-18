@@ -25,14 +25,12 @@ def index():
 def change():
     try:
       data = json.loads(request.data)
-      print(data)
       name = data["name"]
       state = data["state"]
       index = in_list(name);
       if index == -1:
         return "Not in list",500
       devices[index].state = int(state)
-      print(devices[index])
       return "Updated the state",200
     except:
       return "Internal server error",500
