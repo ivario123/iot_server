@@ -27,6 +27,12 @@ import logging
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
+# Create handlers
+c_handler = logging.StreamHandler()
+f_handler = logging.FileHandler('iot.log')
+c_handler.setLevel(logging.WARNING)
+f_handler.setLevel(logging.ERROR)
+
 @cron.scheduled_job('interval', seconds=int(config.get(config_state,"time_out")))
 def check():
     check_active()
@@ -35,7 +41,7 @@ def check():
 atexit.register(lambda: cron.shutdown(wait=False))
 
 db = SQLAlchemy()
-from .models import User
+from .models import User, client_entry
 
 def create_app():
     app = Flask(__name__)

@@ -1,51 +1,53 @@
 <!DOCTYPE html>
 <html>
 
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>IOT server</title>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css" />
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='style.css') }}">
-        <script src="//code.jquery.com/jquery-3.2.1.js"></script>
-        <link href="//cdn.jsdelivr.net/npm/round-slider@1.5.1/dist/roundslider.min.css" rel="stylesheet"/>
-        <script src="https://cdn.jsdelivr.net/npm/round-slider@1.5.1/dist/roundslider.min.js"></script>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="https://image.pngaaa.com/615/3527615-middle.png">
 
-    </head>
+    <title>IOT server</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='style.css') }}">
+    <script src="//code.jquery.com/jquery-3.2.1.js"></script>
+    <link href="//cdn.jsdelivr.net/npm/round-slider@1.5.1/dist/roundslider.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/round-slider@1.5.1/dist/roundslider.min.js"></script>
 
-    <body>
-        <section class="hero is-primary is-fullheight">
+</head>
 
-            <div class="hero-head">
-                <nav class="navbar">
-                    <div class="container">
+<body>
+    <section class="hero is-primary is-fullheight">
 
-                        <div id="navbarMenuHeroA" class="navbar-menu">
-                            <div class="navbar-end">
-                                <a href="{{ url_for('main.index') }}" class="navbar-item">
+        <div class="hero-head">
+            <nav class="navbar">
+                <div class="container">
+
+                    <div id="navbarMenuHeroA" class="navbar-menu">
+                        <div class="navbar-end">
+                            <a href="{{ url_for('main.index') }}" class="navbar-item">
                   Home
                 </a> {% if current_user.is_authenticated %}
 
-                                <a href="{{ url_for('auth.logout') }}" class="navbar-item">
+                            <a href="{{ url_for('auth.logout') }}" class="navbar-item">
                     Logout
                   </a> {% else %}
-                                <a href="{{ url_for('auth.login') }}" class="navbar-item">
+                            <a href="{{ url_for('auth.signup') }}" class="navbar-item">Register</a>
+                            <a href="{{ url_for('auth.login') }}" class="navbar-item">
                   Login
-                </a>
-                                 {%endif%}
-                            </div>
+                </a> {%endif%}
                         </div>
                     </div>
-                </nav>
-            </div>
-
-            <div class="hero-body">
-                <div class="container has-text-centered">
-                    {% block content %} {% endblock %}
                 </div>
+            </nav>
+        </div>
+
+        <div class="hero-body">
+            <div class="container has-text-centered">
+                {% block content %} {% endblock %}
             </div>
-        </section>
-    </body>
+        </div>
+    </section>
+</body>
 
 </html>

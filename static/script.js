@@ -9,11 +9,17 @@ controll_segment = null;
 window.onload = start();
 
 function start() {
-    fetch('/backend/list').then(function (response) {
+    fetch('/backend/dict').then(function(response) {
+        console.log(response);
         return response.json();
-    }).then(function (json) {
+    }).then(function(json) {
         console.log(json);
-        devices = json;
+        devices = [];
+        for (let bruh in json)
+            for (let bruhbruh = 0; bruhbruh < json[bruh].length; bruhbruh++)
+                devices.push(JSON.parse(json[bruh][bruhbruh]));
+        if (Array.isArray(devices) == false)
+            devices = [devices];
         current_name = document.getElementById("name");
         current_type = document.getElementById("type");
         current_state = document.getElementById("state");
@@ -41,6 +47,7 @@ function change_active_device() {
     current_state.innerHTML = devices[index]["state"];
     current_type.innerHTML = devices[index]["type"];
 }
+
 function sleep(milliseconds) {
     const date = Date.now();
     let currentDate = null;
@@ -48,6 +55,7 @@ function sleep(milliseconds) {
         currentDate = Date.now();
     } while (currentDate - date < milliseconds);
 }
+
 function send_change_state(state) {
     let data = { "name": devices[index]["name"], "state": state };
 
@@ -60,59 +68,45 @@ function send_change_state(state) {
     });
 
 }
+
 function removeAllChildNodes(parent) {
     while (parent.firstChild) {
         parent.removeChild(parent.firstChild);
     }
 }
+
 function change_controlls() {
     removeAllChildNodes(controll_segment);
-    switch(devices[index]["type"]){
+    switch (devices[index]["type"]) {
         case "switch":
             button = document.createElement("button");
             button.className = "button is-large";
             button.innerHTML = "Toggle";
-            button.onclick = function () { send_change_state(1 - parseInt(devices[index]["state"])) };
+            button.onclick = function() { send_change_state(1 - parseInt(devices[index]["state"])) };
             controll_segment.appendChild(button);
             break;
         case "dimmer":
-            slider = document.createElement("div");
+            slider = document.createElement("INPUT");
+            slider.setAttribute("type", "range");
+            slider.setAttribute("max", 100);
+            slider.setAttribute("min", 0);
             slider.id = "slider";
-            script = document.createElement("script");
-            script.innerHTML =  `
-            <script>
-                $("#slider").roundSlider({
-                    sliderType: "min-range",
-                    circleShape: "pie",
-                    startAngle: "315",
-                    lineCap: "round",
-                    radius: 130,
-                    width: 20,
-                
-                    min: -50,
-                    max: 50,
-                    
-                    svgMode: true,
-                    pathColor: "#eee",
-                    borderWidth: 0,
-                    
-                    startValue: 0,
-                    
-                    valueChange: function (e) {
-                        var color = e.isInvertedRange ? "#FF5722" : "#8BC34A";
-                    
-                    $("#slider").roundSlider({ "rangeColor": color, "tooltipColor": color });
-                    }
-                });
-                
-                var sliderObj = $("#slider").data("roundSlider");
-                sliderObj.setValue(30);
-            </script>
-            `
+            slider.value = parseInt(devices[index]["state"]);
             controll_segment.appendChild(slider);
-            
+
+            break;
+        case "moisture_sensor":
+            slider = document.createElement("INPUT");
+            slider.setAttribute("type", "range");
+            slider.setAttribute("max", 100);
+            slider.setAttribute("min", 0);
+            slider.id = "slider";
+            slider.disabled = true;
+            slider.value = parseInt(devices[index]["state"]);
+            controll_segment.appendChild(slider);
             break;
     }
+
 
 }
 
@@ -130,16 +124,16 @@ function update_lables() {
             elements[i + 1].style.opacity = (elements.length - i) * 0.5;
             switch (i) {
                 case -1:
-                    elements[i + 1].onclick = function () { itter_index(-1) };
+                    elements[i + 1].onclick = function() { itter_index(-1) };
                     break;
                 case 0:
-                    elements[i + 1].onclick = function () { itter_index(0) };
+                    elements[i + 1].onclick = function() { itter_index(0) };
                     break;
                 case 1:
-                    elements[i + 1].onclick = function () { itter_index(1) };
+                    elements[i + 1].onclick = function() { itter_index(1) };
                     break;
                 case 2:
-                    elements[i + 1].onclick = function () { itter_index(2) };
+                    elements[i + 1].onclick = function() { itter_index(2) };
                     break;
             }
             elements[i + 1].style.display = "";
